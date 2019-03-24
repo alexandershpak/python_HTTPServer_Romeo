@@ -4,12 +4,13 @@ import time
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 from postgres_client import *
+from connection import *
 
 PORT_NUMBER = 5556
 ROUTE = "route"
 DATA = "data"
 
-ROUTE_AGENT_TRACKING = "agent_tracking"
+ROUTE_INSERT_DATA = "insert_data"
 ROUTE_CONTROLLER_TRACKING = "controller_tracking"
 DATABASE_HOST = "database_host"
 
@@ -33,7 +34,7 @@ class myHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         content_len = int(self.headers.getheader('content-length', 0))
         json_data = self.rfile.read(content_len)
-        print json_data
+        print(json_data)
 
         try:
             data = json.loads(json_data)
@@ -44,15 +45,15 @@ class myHandler(BaseHTTPRequestHandler):
             handle_route(self, route, data_json)
         except ValueError:
             print('Got invalid json format, ignoring request')
-            print json_data
+            print(json_data)
             self.send_response(200, 'Error: invalid json format')
             self.send_header('content-type', 'application/json')
             self.end_headers()
 
 
 def handle_route(handler, route, data_array):
-    if route == ROUTE_AGENT_TRACKING :
-        print route
+    if route == ROUTE_INSERT_DATA :
+        print(route)
         try:
             insert_data(data_array)
 
@@ -65,26 +66,25 @@ def handle_route(handler, route, data_array):
             handler.send_header('content-type', 'application/json')
             handler.end_headers()
     elif route == ROUTE_CONTROLLER_TRACKING:
-        print route
+        print(route)
         #TODO to implement
 
 try:
     # Create a web server and define the handler to manage the
     # incoming request
-    def create_connection(CONNECTION_FILE):
-        is_connected = False
-        # host = current_config.get(DATABASE_HOST, "localhost")
-        while not is_connected:
-            is_connected = open_connection("http://127.0.0.1:5556/")
-            time.sleep(5)
+    is_connected = create_connection(CONNECTION_FILE)
+    # host = current_config.get(DATABASE_HOST, "localhost")
+    while not is_connected:
+        is_connected = open_connection("http://127.0.0.1:5556/")
+        time.sleep(5)
 
 
     server = HTTPServer(('', PORT_NUMBER), myHandler)
-    print 'Started httpserver on port ', PORT_NUMBER
+    print('Started httpserver on port ', PORT_NUMBER)
 
     # Wait forever for incoming htto requests
     server.serve_forever()
 
 except KeyboardInterrupt:
-    print '^C received, shutting down the web server'
+    print('^C received, shutting down the web server')
     server.socket.close()

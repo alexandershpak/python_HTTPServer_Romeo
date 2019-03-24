@@ -7,9 +7,12 @@ def create_connection(db_file):
     global conn
     try:
         conn = sqlite3.connect(db_file)
-        print(sqlite3.version)
+        print("created connection to db")
+        print("sqlite version " + sqlite3.version)
+        return True
     except Error as e:
         print(e)
+        return False
     finally:
         conn.close()
 

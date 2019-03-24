@@ -25,7 +25,7 @@ def open_connection(host):
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         return True
     except:
-        print "Unable to open connection to database. Retrying..."
+        print("Unable to open connection to database. Retrying...")
         return False
 
 
@@ -39,7 +39,7 @@ def create_table_if_not_exits():
 
 def insert_data(data_array):
     for data in data_array:
-        print "Data: " + str(data)
+        print("Data: " + str(data))
 
         uuid = data[UUID]
         timestamp = data[TIMESTAMP]
